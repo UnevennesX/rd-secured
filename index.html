@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rd.Secured</title>
-                <link rel="icon" type="image/png" href="https://cdn.dribbble.com/users/7549673/screenshots/17206704/media/1210a9d0ec8af427967e735935861eeb.png?resize=400x300&vertical=center" />
+    <link rel="icon" type="image/png"
+        href="https://cdn.dribbble.com/users/7549673/screenshots/17206704/media/1210a9d0ec8af427967e735935861eeb.png?resize=400x300&vertical=center" />
     <style>
         :root {
             --bg-color: #0a0a0a;
@@ -237,7 +238,7 @@
                 <ul>
                     <li><code>rd_proj_ud</code> (requerido)</li>
                     <li>Identificadores: <code>rdud</code>, <code>s2</code>, <code>rid</code>, <code>rrid</code>,
-                        <code>id</code>, <code>RID</code></li>
+                        <code>id</code>, <code>RID</code>, <code>UID</code></li>
 
                 </ul>
                 <p>Formatos Complejos:</p>
@@ -250,7 +251,7 @@
 
     <script>
         const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        const PARAMETROS_BUSQUEDA = ['rdud', 's2', 'rid', 'rrid', 'id', 'RID'];
+        const PARAMETROS_BUSQUEDA = ['rdud', 's2', 'rid', 'rrid', 'id', 'RID', 'UID'];
         const RD_SECURED_URL = 'https://www.rdsecured.com/return?inbound_code=1000';
         const LIMPIAR_DESPUES_MS = 30000; // 30 segundos
 
@@ -275,10 +276,14 @@
                 const rd_proj_ud = urlObj.searchParams.get('rd_proj_ud');
                 if (!rd_proj_ud || !UUID_REGEX.test(rd_proj_ud)) throw new Error('rd_proj_ud inválido');
 
-                let identificador = PARAMETROS_BUSQUEDA.map(p => urlObj.searchParams.get(p)).find(v => v && UUID_REGEX.test(v)) || urlObj.pathname.split('/').find(part => UUID_REGEX.test(part));
-                if (!identificador) throw new Error('No se encontró UUID');
+                let identificador = PARAMETROS_BUSQUEDA.map(p => {
+                    const paramValue = urlObj.searchParams.get(p);
+                    return { param: p, value: paramValue };
+                }).find(item => item.value && UUID_REGEX.test(item.value)) || { param: null, value: urlObj.pathname.split('/').find(part => UUID_REGEX.test(part)) };
 
-                return `${RD_SECURED_URL}&rdud=${identificador}&rd_proj_ud=${rd_proj_ud}`;
+                if (!identificador.value) throw new Error('No se encontró UUID');
+
+                return `${RD_SECURED_URL}&rdud=${identificador.value}&rd_proj_ud=${rd_proj_ud}`;
 
             } catch (error) {
                 throw new Error(`Error: ${error.message}`);
