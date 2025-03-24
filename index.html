@@ -270,18 +270,34 @@
             infoHeader.querySelector('span').textContent = infoContent.classList.contains('open') ? '▲' : '▼';
         });
 
-        function generarEnlaceSeguro(url) {
+       function generarEnlaceSeguro(url) {
             try {
                 const urlObj = new URL(url);
                 const rd_proj_ud = urlObj.searchParams.get('rd_proj_ud');
                 if (!rd_proj_ud || !UUID_REGEX.test(rd_proj_ud)) throw new Error('rd_proj_ud inválido');
 
-                let identificador = PARAMETROS_BUSQUEDA.map(p => {
-                    const paramValue = urlObj.searchParams.get(p);
-                    return { param: p, value: paramValue };
-                }).find(item => item.value && UUID_REGEX.test(item.value)) || { param: null, value: urlObj.pathname.split('/').find(part => UUID_REGEX.test(part)) };
+                let identificador = null;
 
-                if (!identificador.value) throw new Error('No se encontró UUID');
+                for (const param of PARAMETROS_BUSQUEDA) {
+                    const regex = new RegExp(`^${param}$`, 'i'); // 'i' flag for case-insensitive matching
+                    for (const [key, value] of urlObj.searchParams.entries()) {
+                        if (regex.test(key) && UUID_REGEX.test(value)) {
+                            identificador = { param: key, value: value };
+                            break;
+                        }
+                    }
+                    if (identificador) break;
+                }
+
+
+                if (!identificador) {
+                    const pathPart = urlObj.pathname.split('/').find(part => UUID_REGEX.test(part));
+                    if (pathPart) {
+                        identificador = { param: 'path', value: pathPart };
+                    } else {
+                        throw new Error('No se encontró UUID');
+                    }
+                }
 
                 return `${RD_SECURED_URL}&rdud=${identificador.value}&rd_proj_ud=${rd_proj_ud}`;
 
