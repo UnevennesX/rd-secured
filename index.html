@@ -238,7 +238,7 @@
                 <ul>
                     <li><code>rd_proj_ud</code> (requerido)</li>
                     <li>Identificadores: <code>rdud</code>, <code>s2</code>, <code>rid</code>, <code>rrid</code>,
-                        <code>id</code>, <code>RID</code>, <code>UID</code></li>
+                        <code>id</code>, <code>RID</code>, <code>UID</code>, <code>SMRID</code></li>
 
                 </ul>
                 <p>Formatos Complejos:</p>
@@ -251,7 +251,7 @@
 
     <script>
         const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        const PARAMETROS_BUSQUEDA = ['rdud', 's2', 'rid', 'rrid', 'id', 'RID', 'UID'];
+        const PARAMETROS_BUSQUEDA = ['rdud', 's2', 'rid', 'rrid', 'id', 'RID', 'UID', 'SMRID'];
         const RD_SECURED_URL = 'https://www.rdsecured.com/return?inbound_code=1000';
         const LIMPIAR_DESPUES_MS = 30000; // 30 segundos
 
